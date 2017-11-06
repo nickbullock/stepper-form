@@ -1,7 +1,7 @@
 import {createActions} from 'redux-actions'
 
 const actions = createActions({
-    SET_ACTIVE_FORM: formIndex => ({formIndex})
+    SET_ACTIVE_FORM: formName => ({formName})
 });
 
-export default actions
+export default actions;

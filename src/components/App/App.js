@@ -2,14 +2,14 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import createStore from '../../store/createStore';
-import Home from '../Home';
+import FormContainer from '../../containers/FormContainer';
 
-const store = createStore({carrier: 'all'});
+const store = createStore({activeForm: 'startForm'});
 
 const App = () => (
     <Provider store={store}>
         <Router>
-            <Route path="/" component={Home}/>
+            <Route path="/" component={FormContainer}/>
         </Router>
     </Provider>
 );

@@ -1,11 +1,11 @@
 import {handleActions} from 'redux-actions'
 import actions from '../actions'
 
-const initialState = {carrier: 'all'};
+const initialState = {activeForm: 'startForm'};
 
 const reducers = handleActions({
-    [actions.setCarrier](state, action){
-        return {...state, carrier: action.payload.carrier}
+    [actions.setActiveForm](state, action){
+        return {...state, activeForm: action.payload.activeForm}
     }
 }, initialState);
 
