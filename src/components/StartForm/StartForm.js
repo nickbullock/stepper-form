@@ -25,7 +25,7 @@ class StartForm extends React.Component {
             if(!err){
                 console.log("received values", values)
                 this.props.dispatch(actions.setActiveForm({activeForm: 'middleForm'}));
-                this.props.dispatch(actions.setFormData({form: 'startForm', data: values}));
+                this.props.dispatch(actions.setFormData({formName: 'startForm', formData: values}));
             }
         });
     }

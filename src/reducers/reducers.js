@@ -8,7 +8,7 @@ const reducers = handleActions({
         return {...state, activeForm: action.payload.activeForm}
     },
     [actions.setFormData](state, action){
-        return {...state, [action.payload.form]: action.payload.data}
+        return {...state, [action.payload.formName]: action.payload.formData}
     }
 }, initialState);
 
