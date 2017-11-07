@@ -9,32 +9,44 @@ import Utils from '../../services/Utils';
 
 const Step = Steps.Step;
 
+const activeFormIndexHash = {
+    'startForm': 0,
+    'middleForm': 1,
+    'endForm': 2
+};
+
 class FormContainer extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            Form: null
+        }
     }
 
     componentDidMount() {
-        console.log("active", this.props.activeForm)
-
         Utils.loadForm(this.props.activeForm)
-            .then((data) => {
-                console.log(">>>2", data)
+            .then(formImport => {
+                this.setState({
+                    Form: React.createFactory(formImport.default)
+                })
             })
-            .catch(e => console.log(e))
+            .catch(e => console.error(e))
     }
 
     render() {
+        const activeFormIndex = activeFormIndexHash[this.props.activeForm];
+
         return (
             <Row type="flex" justify="center" align="middle">
                 <Col span={20} style={{marginTop: '30px'}}>
-                    <Steps current={0}>
+                    <Steps current={activeFormIndex}>
                         <Step title="Личные данные"/>
                         <Step title="Номер банковской карты"/>
                         <Step title="Завершение"/>
                     </Steps>
-                    <Col span={24} style={{minHeight: 200, background: 'palevioletred', marginTop: '30px'}}>
-
+                    <Col type="flex" justify="center" align="middle" span={24} style={{marginTop: '30px'}}>
+                        {this.state.Form ? this.state.Form() : 'Загрузка формы...'}
                     </Col>
                 </Col>
             </Row>

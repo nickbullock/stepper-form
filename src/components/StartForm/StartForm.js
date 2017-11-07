@@ -4,6 +4,8 @@ import 'antd/lib/input/style/css';
 import 'antd/lib/button/style/css';
 import 'antd/lib/icon/style/css';
 import 'antd/lib/checkbox/style/css';
+import {connect} from 'react-redux';
+import actions from '../../actions';
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
 const FormItem = Form.Item;
 
@@ -19,7 +21,13 @@ class StartForm extends React.Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.form.validateFields();
+        this.props.form.validateFields((err, values) => {
+            if(!err){
+                console.log("received values", values)
+                this.props.dispatch(actions.setActiveForm({activeForm: 'middleForm'}));
+                this.props.dispatch(actions.setFormData({form: 'startForm', data: values}));
+            }
+        });
     }
 
     render() {
@@ -45,16 +53,10 @@ class StartForm extends React.Component {
                         <Input prefix={<Icon style={{ fontSize: 13 }} />} type="number" placeholder="Возраст" />
                     )}
                 </FormItem>
-                <FormItem validateStatus={ageError ? 'error' : ''} help={ageError || ''}>
-                    {getFieldDecorator('age', {
-                        rules: [{ required: true}],
-                    })(
-                        <Input prefix={<Icon style={{ fontSize: 13 }} />} type="number" placeholder="Возраст" />
-                    )}
-                </FormItem>
                 <FormItem style={{ marginBottom: 8 }}>
                     {getFieldDecorator('agreement', {
                         valuePropName: 'checked',
+                        rules: [{ required: true}]
                     })(
                         <Checkbox>Мне есть 18 лет</Checkbox>
                     )}
@@ -69,4 +71,4 @@ class StartForm extends React.Component {
     }
 }
 
-export default Form.create()(StartForm);
+export default connect()(Form.create()(StartForm));

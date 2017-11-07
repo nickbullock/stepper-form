@@ -3,15 +3,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
 
     entry: {
-        app: "./src/index.js",
-        // startForm: "./src/components/StartForm/index.js",
-        // middleForm: "./src/components/chunks/middleForm.index.js",
-        // endForm: "./src/components/chunks/endForm.index.js"
+        app: "./src/index.js"
     },
 
     output: {
         path: __dirname + "/dist",
-        filename: "[name].js"
+        filename: "[name].bundle.js",
+        chunkFilename: "[name].bundle.js"
     },
 
     watch: true,
@@ -24,7 +22,7 @@ module.exports = {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                exclude: /(node_modules|bower_components)/,
+                exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
                     options: {
@@ -54,7 +52,7 @@ module.exports = {
 
     devServer: {
         contentBase: __dirname + "/dist",
-        port: 8080,
+        port: 3000,
         open: true
     }
 
