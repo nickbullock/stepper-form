@@ -5,64 +5,48 @@ import 'antd/lib/button/style/css';
 import 'antd/lib/icon/style/css';
 import 'antd/lib/checkbox/style/css';
 import {connect} from 'react-redux';
-import actions from '../../actions';
 import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import Utils from '../../services/utils';
 const FormItem = Form.Item;
 
-function hasErrors(fieldsError) {
-    return Object.keys(fieldsError).some(field => fieldsError[field]);
-}
-
 class StartForm extends React.Component {
-    componentDidMount() {
-        // To disabled submit button at the beginning.
-        this.props.form.validateFields();
-    }
-
-    handleSubmit = (e) => {
-        e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if(!err){
-                console.log("received values", values)
-                this.props.dispatch(actions.setActiveForm({activeForm: 'middleForm'}));
-                this.props.dispatch(actions.setFormData({formName: 'startForm', formData: values}));
-            }
-        });
-    }
 
     render() {
-        const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
+        const { getFieldDecorator, getFieldError} = this.props.form;
 
-        // Only show error after a field is touched.
-        const nameError = isFieldTouched('name') && getFieldError('name');
-        const ageError = isFieldTouched('age') && getFieldError('age');
+        const nameError = getFieldError('name');
+        const ageError = getFieldError('age');
+        const agreementError = getFieldError('agreement');
 
         return (
-            <Form layout="inline" onSubmit={this.handleSubmit}>
-                <FormItem validateStatus={nameError ? 'error' : ''} help={nameError || ''} >
+            <Form layout="inline" onSubmit={Utils.goToForm.bind(this, 'middleForm')}>
+                <FormItem validateStatus={nameError ? 'error' : ''} help={''} >
                     {getFieldDecorator('name', {
-                        rules: [{ required: true}],
+                        rules: [{ required: true, pattern: /^[A-Za-z]+$/}],
                     })(
                         <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="Имя" />
                     )}
                 </FormItem>
-                <FormItem validateStatus={ageError ? 'error' : ''} help={ageError || ''}>
+                <FormItem validateStatus={ageError ? 'error' : ''} help={''}>
                     {getFieldDecorator('age', {
-                        rules: [{ required: true}],
+                        rules: [{ required: true, pattern: /^[0-9]+$/}],
                     })(
                         <Input prefix={<Icon style={{ fontSize: 13 }} />} type="number" placeholder="Возраст" />
                     )}
                 </FormItem>
-                <FormItem style={{ marginBottom: 8 }}>
+                <FormItem style={{ marginBottom: 8 }} validateStatus={agreementError ? 'error' : ''}
+                          help={agreementError ? 'Обязательное поле' : ''} >
                     {getFieldDecorator('agreement', {
                         valuePropName: 'checked',
-                        rules: [{ required: true}]
+                        rules: [
+                            { required: true, type: 'boolean', enum: [true]}
+                        ]
                     })(
                         <Checkbox>Мне есть 18 лет</Checkbox>
                     )}
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" htmlType="submit" disabled={hasErrors(getFieldsError())}>
+                    <Button type="primary" htmlType="submit">
                         Далее
                     </Button>
                 </FormItem>
