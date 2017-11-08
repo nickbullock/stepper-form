@@ -10,6 +10,13 @@ import Utils from '../../services/utils';
 const FormItem = Form.Item;
 
 class MiddleForm extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            values: Utils.getInitialValues()
+        }
+    }
 
     formatCardNumber(e) {
         const backspace = 8;
@@ -33,19 +40,19 @@ class MiddleForm extends React.Component {
         const cardNameError = getFieldError('cardNumber');
 
         return (
-            <Form layout="horizontal" onSubmit={Utils.goToForm.bind(this, 'endForm')}>
+            <Form layout="horizontal">
                 <FormItem validateStatus={cardNameError ? 'error' : ''} help={''} >
                     {getFieldDecorator('cardNumber', {
-                        rules: [{ required: true, transform: (value) => value.replace(/\s/g, ''), pattern: /^[0-9]+$/}],
+                        rules: [{ required: true, transform: (value) => value ? value.replace(/\s/g, '') : '', pattern: /^[0-9]+$/}],
                     })(
                         <Input placeholder="Номер банковской карты" onKeyDown={this.formatCardNumber.bind(this)}/>
                     )}
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" htmlType="submit">
+                    <Button type="primary" onClick={Utils.goToForm.bind(this, 'endForm')}>
                         Далее
                     </Button>
-                    <Button type="danger" onClick={Utils.goToForm.bind(this, 'middleForm')}>
+                    <Button type="danger" onClick={Utils.goToForm.bind(this, 'startForm', true)}>
                         Назад
                     </Button>
                 </FormItem>
@@ -54,4 +61,6 @@ class MiddleForm extends React.Component {
     }
 }
 
-export default connect()(Form.create()(MiddleForm));
+const mapStateToProps = (state) => ({activeForm: state.activeForm});
+
+export default connect(mapStateToProps)(Form.create()(MiddleForm));

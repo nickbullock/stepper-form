@@ -9,7 +9,16 @@ import { Form, Icon, Input, Button, Checkbox } from 'antd';
 import Utils from '../../services/utils';
 const FormItem = Form.Item;
 
+
 class StartForm extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            values: getInitialValues()
+        };
+    }
 
     render() {
         const { getFieldDecorator, getFieldError} = this.props.form;
@@ -19,9 +28,10 @@ class StartForm extends React.Component {
         const agreementError = getFieldError('agreement');
 
         return (
-            <Form layout="inline" onSubmit={Utils.goToForm.bind(this, 'middleForm')}>
+            <Form layout="inline">
                 <FormItem validateStatus={nameError ? 'error' : ''} help={''} >
                     {getFieldDecorator('name', {
+                        initialValue: this.state.values.name,
                         rules: [{ required: true, pattern: /^[A-Za-z]+$/}],
                     })(
                         <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="Имя" />
@@ -46,7 +56,7 @@ class StartForm extends React.Component {
                     )}
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" htmlType="submit">
+                    <Button type="primary" onClick={Utils.goToForm.bind(this, 'middleForm')}>
                         Далее
                     </Button>
                 </FormItem>
@@ -55,4 +65,6 @@ class StartForm extends React.Component {
     }
 }
 
-export default connect()(Form.create()(StartForm));
+const mapStateToProps = (state) => ({activeForm: state.activeForm});
+
+export default connect(mapStateToProps)(Form.create()(StartForm));

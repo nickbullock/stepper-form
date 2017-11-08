@@ -18,14 +18,30 @@ export default class Utils {
         }
     }
 
-    static goToForm(formName, event){
+    static goToForm(formName, skipValidate, event){
         if(!this.props) return null;
 
-        event.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if(!err){
-                this.props.dispatch(actions.setActiveForm({activeForm: formName, [this.props.activeForm]: values}));
-            }
-        });
+        console.log('ARG', this.props)
+        
+        const save = (values) => {
+            this.props.dispatch(actions.setActiveForm({activeForm: formName}));
+            console.log("TO STORAGE", this.props.activeForm, values)
+            localStorage.setItem(this.props.activeForm, JSON.stringify(values));
+        };
+        
+        if(!skipValidate){
+            this.props.form.validateFields((err, values) => {
+                if(!err){
+                    save(values);
+                }
+            });
+        }
+        else{
+            save(this.props.form.getFieldsValue());
+        }
+    }
+
+    static getInitialValues() {
+        return JSON.parse(localStorage.getItem(this.props.activeForm)) || {};
     }
 }

@@ -32,4 +32,6 @@ class EndForm extends React.Component {
     }
 }
 
-export default connect()(Form.create()(EndForm));
+const mapStateToProps = (state) => ({activeForm: state.activeForm});
+
+export default connect(mapStateToProps)(Form.create()(EndForm));
