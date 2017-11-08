@@ -5,10 +5,9 @@ import 'antd/lib/button/style/css';
 import 'antd/lib/icon/style/css';
 import 'antd/lib/checkbox/style/css';
 import {connect} from 'react-redux';
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
-import Utils from '../../services/utils';
-const FormItem = Form.Item;
+import {Form, Icon, Input, Button, Checkbox} from 'antd';
 
+const FormItem = Form.Item;
 
 class StartForm extends React.Component {
 
@@ -16,12 +15,23 @@ class StartForm extends React.Component {
         super(props);
 
         this.state = {
-            values: getInitialValues()
+            values: props.getInitialValues.call(this)
         };
+
+    }
+
+    componentWillReceiveProps(nextProps){
+        const errors = Object.values(nextProps.form.getFieldsError()).filter(error => !!error);
+        if(nextProps.goToFormViaStep
+            && nextProps.activeForm !== nextProps.goToFormViaStep
+            && errors.length === 0){
+
+            nextProps.goToForm.call(this, nextProps.goToFormViaStep, true)
+        }
     }
 
     render() {
-        const { getFieldDecorator, getFieldError} = this.props.form;
+        const {getFieldDecorator, getFieldError} = this.props.form;
 
         const nameError = getFieldError('name');
         const ageError = getFieldError('age');
@@ -29,34 +39,36 @@ class StartForm extends React.Component {
 
         return (
             <Form layout="inline">
-                <FormItem validateStatus={nameError ? 'error' : ''} help={''} >
+                <FormItem validateStatus={nameError ? 'error' : ''} help={''}>
                     {getFieldDecorator('name', {
                         initialValue: this.state.values.name,
-                        rules: [{ required: true, pattern: /^[A-Za-z]+$/}],
+                        rules: [{required: true, pattern: /^[A-Za-z]+$/}],
                     })(
-                        <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="Имя" />
+                        <Input prefix={<Icon type="user" style={{fontSize: 13}}/>} placeholder="Имя"/>
                     )}
                 </FormItem>
                 <FormItem validateStatus={ageError ? 'error' : ''} help={''}>
                     {getFieldDecorator('age', {
-                        rules: [{ required: true, pattern: /^[0-9]+$/}],
+                        initialValue: this.state.values.age,
+                        rules: [{required: true, pattern: /^[0-9]+$/}],
                     })(
-                        <Input prefix={<Icon style={{ fontSize: 13 }} />} type="number" placeholder="Возраст" />
+                        <Input prefix={<Icon style={{fontSize: 13}}/>} type="number" placeholder="Возраст"/>
                     )}
                 </FormItem>
-                <FormItem style={{ marginBottom: 8 }} validateStatus={agreementError ? 'error' : ''}
-                          help={agreementError ? 'Обязательное поле' : ''} >
+                <FormItem style={{marginBottom: 8}} validateStatus={agreementError ? 'error' : ''}
+                          help={agreementError ? 'Обязательное поле' : ''}>
                     {getFieldDecorator('agreement', {
+                        initialValue: this.state.values.agreement,
                         valuePropName: 'checked',
                         rules: [
-                            { required: true, type: 'boolean', enum: [true]}
+                            {required: true, pattern: /^true$/}
                         ]
                     })(
                         <Checkbox>Мне есть 18 лет</Checkbox>
                     )}
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" onClick={Utils.goToForm.bind(this, 'middleForm')}>
+                    <Button type="primary" onClick={this.props.goToForm.bind(this, 'middleForm', true)}>
                         Далее
                     </Button>
                 </FormItem>
@@ -65,6 +77,6 @@ class StartForm extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => ({activeForm: state.activeForm});
+const mapStateToProps = (state) => ({activeForm: state.activeForm, activeFormViaStep: state.activeFormViaStep});
 
 export default connect(mapStateToProps)(Form.create()(StartForm));
