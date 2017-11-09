@@ -61,6 +61,10 @@ class FormContainer extends Component {
         return false;
     }
 
+    checkValidationNeeded(newActiveForm) {
+        return activeFormIndexHash[newActiveForm] > activeFormIndexHash[this.props.activeForm];
+    }
+
     render() {
         const activeFormIndex = activeFormIndexHash[this.props.activeForm];
         const Form = this.props.Form;
@@ -76,12 +80,11 @@ class FormContainer extends Component {
                 <Col span={24}>
                     <Steps current={activeFormIndex}>
                         {stepList.map(step => <Step key={step.formName}
-                                                    onClick={this.goToForm.bind(this, step.formName, true)}
+                                                    onClick={this.goToForm.bind(this, step.formName, this.checkValidationNeeded.call(this, step.formName))}
                                                     title={step.formTitle} style={{cursor: 'pointer'}}/>)}
                     </Steps>
                     <Col type="flex" justify="center" align="middle" span={24} style={{marginTop: '30px'}}>
-                        {Form ? <Form goToForm={this.goToForm}
-                                      getInitialValues={this.getInitialValues}/> : 'Загрузка формы...'}
+                        {Form ? <Form goToForm={this.goToForm}/> : 'Загрузка формы...'}
                     </Col>
                 </Col>);
 
