@@ -22,22 +22,15 @@ const stepList = [
 ];
 
 class FormContainer extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            Form: null
-        };
-    }
 
     componentDidMount() {
         //load start form asynchronously
-        this.loadForm(this.props.activeForm);
+        this.props.dispatch(actions.loadForm(this.props.activeForm, Utils.loadForm));
     }
 
     componentWillReceiveProps(nextProps) {
         //load another form asynchronously
-        this.loadForm(nextProps.activeForm);
+        this.props.dispatch(actions.loadForm(this.props.activeForm, Utils.loadForm));
     }
 
     loadForm(activeForm) {
@@ -79,7 +72,7 @@ class FormContainer extends Component {
 
     render() {
         const activeFormIndex = activeFormIndexHash[this.props.activeForm];
-        const Form = this.state.Form;
+        const Form = this.props.Form;
         //there is different content when form is completed
         const content = this.props.completed
             ? (
@@ -111,6 +104,7 @@ class FormContainer extends Component {
 }
 
 const mapStateToProps = (state) => ({
+    Form: state.Form,
     activeForm: state.activeForm,
     formController: state.formController,
     completed: state.completed

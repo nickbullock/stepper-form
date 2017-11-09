@@ -8,7 +8,8 @@ const store = createStore({
     activeForm: 'startForm',
     completed: false,
     formController: null,
-    initialValues: {}
+    initialValues: {},
+    Form: null
 });
 
 const App = () => (
