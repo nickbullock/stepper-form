@@ -19,8 +19,7 @@
   },
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server",
-    "test": "jest"
+    "start": "webpack-dev-server"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
