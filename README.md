@@ -8,6 +8,5 @@ Simple stepper sith async form loading and validation.
 ## Quick start
 ```
 npm install;
-npm build;
 npm start;
 ```

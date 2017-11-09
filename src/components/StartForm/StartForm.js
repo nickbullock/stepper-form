@@ -1,11 +1,12 @@
 import React from 'react';
 import 'antd/lib/form/style/css';
 import 'antd/lib/input/style/css';
+import 'antd/lib/input-number/style/css';
 import 'antd/lib/button/style/css';
 import 'antd/lib/icon/style/css';
 import 'antd/lib/checkbox/style/css';
 import {connect} from 'react-redux';
-import {Form, Icon, Input, Button, Checkbox} from 'antd';
+import {Form, Icon, Input, InputNumber, Button, Checkbox} from 'antd';
 import actions from '../../actions';
 
 const FormItem = Form.Item;
@@ -18,7 +19,7 @@ class StartForm extends React.Component {
     }
 
     render() {
-        const {getFieldDecorator, getFieldError, getFieldValue} = this.props.form;
+        const {getFieldDecorator, getFieldError} = this.props.form;
 
         const nameError = getFieldError('name');
         const ageError = getFieldError('age');
@@ -26,7 +27,10 @@ class StartForm extends React.Component {
         const ageValidator = (rule, value, cb) => {
             const errors = [];
 
-            if(value && Number.isInteger(+value) && +value < 18){
+            if(!value){
+                errors.push(new Error("REQUIRED"));
+            }
+            if(Number.isInteger(+value) && +value < 18){
                 errors.push(new Error("MIN_AGE_IS_18"));
             }
 
@@ -50,8 +54,9 @@ class StartForm extends React.Component {
                     {getFieldDecorator('age', {
                         initialValue: this.props.initialValues.age,
                         rules: [{required: true, pattern: /^[0-9]+$/, validator: ageValidator}]
+
                     })(
-                        <Input prefix={<Icon style={{fontSize: 13}}/>} type="number" placeholder="Возраст"/>
+                        <InputNumber prefix={<Icon style={{fontSize: 13}}/>} min={18} placeholder="Возраст"/>
                     )}
                 </FormItem>
                 <FormItem style={{marginBottom: 8}} validateStatus={agreementError ? 'error' : ''}
