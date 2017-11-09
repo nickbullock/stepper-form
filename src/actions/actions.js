@@ -1,4 +1,4 @@
-import {createActions, combineActions} from 'redux-actions';
+import {createActions} from 'redux-actions';
 import {createActionThunk} from 'redux-thunk-actions';
 
 const actions = createActions({

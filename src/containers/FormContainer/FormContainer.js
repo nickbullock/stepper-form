@@ -30,18 +30,9 @@ class FormContainer extends Component {
 
     componentWillReceiveProps(nextProps) {
         //load another form asynchronously
-        this.props.dispatch(actions.loadForm(this.props.activeForm, Utils.loadForm));
-    }
-
-    loadForm(activeForm) {
-        return Utils.loadForm(activeForm)
-            .then(formImport => {
-                //keep Form component in local state
-                this.setState({
-                    Form: formImport.default
-                })
-            })
-            .catch(e => console.error(e))
+        if(this.props.activeForm !== nextProps.activeForm){
+            this.props.dispatch(actions.loadForm(nextProps.activeForm, Utils.loadForm));
+        }
     }
 
     goToForm(newActiveForm, isValidationNeeded) {
@@ -54,7 +45,7 @@ class FormContainer extends Component {
             this.props.dispatch(actions.changeForm(newActiveForm));
         };
 
-        if(isValidationNeeded) {
+        if (isValidationNeeded) {
             formController.validateFields((err, values) => {
                 if (!err) {
                     dispatchAndSave(values);
@@ -63,8 +54,8 @@ class FormContainer extends Component {
                 return false;
             });
         }
-        else{
-            dispatchAndSave(formController.getFieldsValue())
+        else {
+            dispatchAndSave(formController.getFieldsValue());
         }
 
         return false;
@@ -76,22 +67,23 @@ class FormContainer extends Component {
         //there is different content when form is completed
         const content = this.props.completed
             ? (
-                <Col type="flex" justify="center" align="middle" span={24} style={{marginTop: '30px', fontSize: '25px'}}>
+                <Col type="flex" justify="center" align="middle" span={24}
+                     style={{marginTop: '30px', fontSize: '25px'}}>
                     Завершено
                 </Col>
             )
             : (
                 <Col span={24}>
-                <Steps current={activeFormIndex}>
-                    {stepList.map(step => <Step key={step.formName}
-                                                onClick={this.goToForm.bind(this, step.formName, true)}
-                                                title={step.formTitle} style={{cursor: 'pointer'}}/>)}
-                </Steps>
-                <Col type="flex" justify="center" align="middle" span={24} style={{marginTop: '30px'}}>
-                    {Form ? <Form goToForm={this.goToForm} getInitialValues={this.getInitialValues}/> : 'Загрузка формы...'}
-                </Col>
-            </Col>);
-
+                    <Steps current={activeFormIndex}>
+                        {stepList.map(step => <Step key={step.formName}
+                                                    onClick={this.goToForm.bind(this, step.formName, true)}
+                                                    title={step.formTitle} style={{cursor: 'pointer'}}/>)}
+                    </Steps>
+                    <Col type="flex" justify="center" align="middle" span={24} style={{marginTop: '30px'}}>
+                        {Form ? <Form goToForm={this.goToForm}
+                                      getInitialValues={this.getInitialValues}/> : 'Загрузка формы...'}
+                    </Col>
+                </Col>);
 
         return (
             <Row type="flex" justify="center" align="middle">

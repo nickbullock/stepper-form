@@ -18,7 +18,7 @@ class StartForm extends React.Component {
     }
 
     render() {
-        const {getFieldDecorator, getFieldError} = this.props.form;
+        const {getFieldDecorator, getFieldError, getFieldValue} = this.props.form;
 
         const nameError = getFieldError('name');
         const ageError = getFieldError('age');
@@ -26,7 +26,7 @@ class StartForm extends React.Component {
         const ageValidator = (rule, value, cb) => {
             const errors = [];
 
-            if(value < 18){
+            if(value && Number.isInteger(+value) && +value < 18){
                 errors.push(new Error("MIN_AGE_IS_18"));
             }
 
@@ -45,7 +45,8 @@ class StartForm extends React.Component {
                         <Input prefix={<Icon type="user" style={{fontSize: 13}}/>} placeholder="Имя"/>
                     )}
                 </FormItem>
-                <FormItem validateStatus={ageError ? 'error' : ''} help={ageError && ageError.includes('MIN_LENGTH_IS_18') ? 'Возраст должен быть больше 18' : ''}>
+                <FormItem validateStatus={ageError ? 'error' : ''}
+                          help={ageError && ageError.includes('MIN_AGE_IS_18')  ? 'Возраст должен быть больше 18' : ''}>
                     {getFieldDecorator('age', {
                         initialValue: this.props.initialValues.age,
                         rules: [{required: true, pattern: /^[0-9]+$/, validator: ageValidator}]
