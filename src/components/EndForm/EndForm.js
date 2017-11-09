@@ -5,24 +5,20 @@ import 'antd/lib/button/style/css';
 import 'antd/lib/icon/style/css';
 import 'antd/lib/checkbox/style/css';
 import {connect} from 'react-redux';
-import actions from '../../actions';
 import {Form, Button} from 'antd';
+import actions from '../../actions';
 
 const FormItem = Form.Item;
 
 class EndForm extends React.Component {
-    complete() {
-        this.props.dispatch(actions.complete(true));
+
+    componentDidMount(){
+        this.props.dispatch(actions.setActiveFormController(this.props.form));
+        this.props.dispatch(actions.loadInitialValues(this.props.activeForm));
     }
 
-    componentWillReceiveProps(nextProps){
-        const errors = Object.values(nextProps.form.getFieldsError()).filter(error => !!error);
-        if(nextProps.goToFormViaStep
-            && nextProps.activeForm !== nextProps.goToFormViaStep
-            && errors.length === 0){
-
-            nextProps.goToForm.call(this, nextProps.goToFormViaStep, true)
-        }
+    complete() {
+        this.props.dispatch(actions.complete(true));
     }
 
     render() {

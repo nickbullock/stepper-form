@@ -4,7 +4,12 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import createStore from '../../store/createStore';
 import FormContainer from '../../containers/FormContainer';
 
-const store = createStore({activeForm: 'startForm', completed: false});
+const store = createStore({
+    activeForm: 'startForm',
+    completed: false,
+    formController: null,
+    initialValues: {}
+});
 
 const App = () => (
     <Provider store={store}>

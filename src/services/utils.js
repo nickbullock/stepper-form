@@ -1,5 +1,3 @@
-import actions from '../actions';
-
 export default class Utils {
     static loadForm(formName) {
         //load form chunk by it's name

@@ -6,28 +6,15 @@ import 'antd/lib/icon/style/css';
 import 'antd/lib/checkbox/style/css';
 import {connect} from 'react-redux';
 import {Form, Icon, Input, Button, Checkbox} from 'antd';
+import actions from '../../actions';
 
 const FormItem = Form.Item;
 
 class StartForm extends React.Component {
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            values: props.getInitialValues.call(this)
-        };
-
-    }
-
-    componentWillReceiveProps(nextProps){
-        const errors = Object.values(nextProps.form.getFieldsError()).filter(error => !!error);
-        if(nextProps.goToFormViaStep
-            && nextProps.activeForm !== nextProps.goToFormViaStep
-            && errors.length === 0){
-
-            nextProps.goToForm.call(this, nextProps.goToFormViaStep, true)
-        }
+    componentDidMount() {
+        this.props.dispatch(actions.setActiveFormController(this.props.form));
+        this.props.dispatch(actions.loadInitialValues(this.props.activeForm));
     }
 
     render() {
@@ -35,22 +22,33 @@ class StartForm extends React.Component {
 
         const nameError = getFieldError('name');
         const ageError = getFieldError('age');
+
+        const ageValidator = (rule, value, cb) => {
+            const errors = [];
+
+            if(value < 18){
+                errors.push(new Error("MIN_AGE_IS_18"));
+            }
+
+            cb(errors);
+        };
         const agreementError = getFieldError('agreement');
 
         return (
+
             <Form layout="inline">
                 <FormItem validateStatus={nameError ? 'error' : ''} help={''}>
                     {getFieldDecorator('name', {
-                        initialValue: this.state.values.name,
+                        initialValue: this.props.initialValues.name,
                         rules: [{required: true, pattern: /^[A-Za-z]+$/}],
                     })(
                         <Input prefix={<Icon type="user" style={{fontSize: 13}}/>} placeholder="Имя"/>
                     )}
                 </FormItem>
-                <FormItem validateStatus={ageError ? 'error' : ''} help={''}>
+                <FormItem validateStatus={ageError ? 'error' : ''} help={ageError && ageError.includes('MIN_LENGTH_IS_18') ? 'Возраст должен быть больше 18' : ''}>
                     {getFieldDecorator('age', {
-                        initialValue: this.state.values.age,
-                        rules: [{required: true, pattern: /^[0-9]+$/}],
+                        initialValue: this.props.initialValues.age,
+                        rules: [{required: true, pattern: /^[0-9]+$/, validator: ageValidator}]
                     })(
                         <Input prefix={<Icon style={{fontSize: 13}}/>} type="number" placeholder="Возраст"/>
                     )}
@@ -58,7 +56,7 @@ class StartForm extends React.Component {
                 <FormItem style={{marginBottom: 8}} validateStatus={agreementError ? 'error' : ''}
                           help={agreementError ? 'Обязательное поле' : ''}>
                     {getFieldDecorator('agreement', {
-                        initialValue: this.state.values.agreement,
+                        initialValue: this.props.initialValues.agreement,
                         valuePropName: 'checked',
                         rules: [
                             {required: true, pattern: /^true$/}
@@ -77,6 +75,6 @@ class StartForm extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => ({activeForm: state.activeForm, activeFormViaStep: state.activeFormViaStep});
+const mapStateToProps = (state) => ({activeForm: state.activeForm, initialValues: state.initialValues});
 
 export default connect(mapStateToProps)(Form.create()(StartForm));

@@ -6,26 +6,14 @@ import 'antd/lib/icon/style/css';
 import 'antd/lib/checkbox/style/css';
 import {connect} from 'react-redux';
 import {Form, Input, Button} from 'antd';
+import actions from '../../actions';
 
 const FormItem = Form.Item;
 
 class MiddleForm extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            values: props.getInitialValues.call(this)
-        }
-    }
-
-    componentWillReceiveProps(nextProps){
-        const errors = Object.values(nextProps.form.getFieldsError()).filter(error => !!error);
-        if(nextProps.goToFormViaStep
-            && nextProps.activeForm !== nextProps.goToFormViaStep
-            && errors.length === 0){
-
-            nextProps.goToForm.call(this, nextProps.goToFormViaStep, true)
-        }
+    componentDidMount(){
+        this.props.dispatch(actions.setActiveFormController(this.props.form));
+        this.props.dispatch(actions.loadInitialValues(this.props.activeForm));
     }
 
     //function to add space after every 4 symbols
@@ -56,7 +44,7 @@ class MiddleForm extends React.Component {
             <Form layout="horizontal">
                 <FormItem validateStatus={cardNameError ? 'error' : ''} help={''}>
                     {getFieldDecorator('cardNumber', {
-                        initialValue: this.state.values.cardNumber,
+                        initialValue: this.props.initialValues.cardNumber,
                         rules: [{
                             required: true,
                             transform: (value) => value ? value.replace(/\s/g, '') : '',
@@ -79,6 +67,6 @@ class MiddleForm extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => ({activeForm: state.activeForm});
+const mapStateToProps = (state) => ({activeForm: state.activeForm, initialValues: state.initialValues});
 
 export default connect(mapStateToProps)(Form.create()(MiddleForm));

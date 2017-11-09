@@ -52,32 +52,29 @@ class FormContainer extends Component {
     }
 
     goToForm(newActiveForm, isValidationNeeded) {
+        //function can be called from Forms and FormContainer too;
+        // store keep controller as FormController and antd Form.create() keeps controller in props
+        const formController = this.props.form || this.props.formController;
+
         const dispatchAndSave = (values) => {
-            this.props.dispatch(actions.changeForm(newActiveForm));
             localStorage.setItem(this.props.activeForm, JSON.stringify(values));
+            this.props.dispatch(actions.changeForm(newActiveForm));
         };
 
         if(isValidationNeeded) {
-            this.props.form.validateFields((err, values) => {
+            formController.validateFields((err, values) => {
                 if (!err) {
                     dispatchAndSave(values);
                 }
 
-                return false
+                return false;
             });
         }
         else{
-            dispatchAndSave(this.props.form.getFieldsValue());
+            dispatchAndSave(formController.getFieldsValue())
         }
-    }
 
-    getInitialValues() {
-        return JSON.parse(localStorage.getItem(this.props.activeForm)) || {};
-    }
-
-    changeFormViaStep(formName) {
-        console.log("ACTIVE IS ", formName)
-        this.setState({goToFormViaStep: formName});
+        return false;
     }
 
     render() {
@@ -94,12 +91,11 @@ class FormContainer extends Component {
                 <Col span={24}>
                 <Steps current={activeFormIndex}>
                     {stepList.map(step => <Step key={step.formName}
-                                                onClick={this.changeFormViaStep.bind(this, step.formName)}
+                                                onClick={this.goToForm.bind(this, step.formName, true)}
                                                 title={step.formTitle} style={{cursor: 'pointer'}}/>)}
                 </Steps>
                 <Col type="flex" justify="center" align="middle" span={24} style={{marginTop: '30px'}}>
-                    {Form ? <Form goToFormViaStep={this.state.goToFormViaStep} goToForm={this.goToForm}
-                                  getInitialValues={this.getInitialValues}/> : 'Загрузка формы...'}
+                    {Form ? <Form goToForm={this.goToForm} getInitialValues={this.getInitialValues}/> : 'Загрузка формы...'}
                 </Col>
             </Col>);
 
@@ -114,6 +110,10 @@ class FormContainer extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({activeForm: state.activeForm, completed: state.completed});
+const mapStateToProps = (state) => ({
+    activeForm: state.activeForm,
+    formController: state.formController,
+    completed: state.completed
+});
 
 export default connect(mapStateToProps)(FormContainer);
