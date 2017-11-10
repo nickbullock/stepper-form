@@ -1,7 +1,13 @@
 import {handleActions} from 'redux-actions'
 import actions from '../actions'
 
-const initialState = {activeForm: 'startForm', completed: false, formController: null, Form: null};
+const initialState = {
+    activeForm: 'startForm',
+    formController: null,
+    initialValues: {},
+    Form: null,
+    completedForms: []
+};
 
 const reducers = handleActions({
     [actions.loadFormSucceeded](state, action){
@@ -22,8 +28,10 @@ const reducers = handleActions({
         return {...state, initialValues: initialValues};
     },
 
-    [actions.complete](state, action){
-        return {...state, completed: action.payload.completed};
+    [actions.setFormCompletedStatus](state, action){
+        const completedFormsHash = {...state.completedFormsHash, ...action.payload.formStatus};
+
+        return {...state, completedFormsHash}
     }
 }, initialState);
 

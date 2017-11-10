@@ -18,7 +18,7 @@ class EndForm extends React.Component {
     }
 
     complete() {
-        this.props.dispatch(actions.complete(true));
+        this.props.dispatch(actions.setFormCompletedStatus({[this.props.activeForm]: true}));
     }
 
     render() {

@@ -3,7 +3,8 @@ import {connect} from 'react-redux';
 import 'antd/lib/steps/style/css';
 import 'antd/lib/row/style/css';
 import 'antd/lib/col/style/css';
-import {Row, Col} from 'antd';
+import 'antd/lib/notification/style/css';
+import {Row, Col, notification} from 'antd';
 import {Steps} from 'antd';
 import Utils from '../../services/utils';
 import actions from '../../actions';
@@ -40,6 +41,15 @@ class FormContainer extends Component {
         // store keep controller as FormController and antd Form.create() keeps controller in props
         const formController = this.props.form || this.props.formController;
 
+        if(activeFormIndexHash[newActiveForm] - activeFormIndexHash[this.props.activeForm] === 2){
+            if(!this.props.completedFormsHash.middleForm){
+                return notification.warning({
+                    message: 'Не удалось перейти к форме',
+                    description: 'Вы заполнили не все формы, предшествующие выбранной.'
+                });
+            }
+        }
+
         const dispatchAndSave = (values) => {
             localStorage.setItem(this.props.activeForm, JSON.stringify(values));
             this.props.dispatch(actions.changeForm(newActiveForm));
@@ -49,12 +59,19 @@ class FormContainer extends Component {
             formController.validateFields((err, values) => {
                 if (!err) {
                     dispatchAndSave(values);
+                    this.props.dispatch(actions.setFormCompletedStatus({[this.props.activeForm] : true}));
                 }
 
                 return false;
             });
         }
+        //else branch code works only if user goes previous form
         else {
+            if(activeFormIndexHash[this.props.activeForm] !== 'endForm'){
+                this.props.dispatch(actions.setFormCompletedStatus({[this.props.activeForm] : false}));
+            }
+
+            formController.resetFields();
             dispatchAndSave(formController.getFieldsValue());
         }
 
@@ -68,8 +85,10 @@ class FormContainer extends Component {
     render() {
         const activeFormIndex = activeFormIndexHash[this.props.activeForm];
         const Form = this.props.Form;
+        //calc count of completed forms
+        const completedFormCount = Object.values(this.props.completedFormsHash).filter(status => !!status).length;
         //there is different content when form is completed
-        const content = this.props.completed
+        const content = completedFormCount === 3
             ? (
                 <Col type="flex" justify="center" align="middle" span={24}
                      style={{marginTop: '30px', fontSize: '25px'}}>
@@ -83,6 +102,7 @@ class FormContainer extends Component {
                                                     onClick={this.goToForm.bind(this, step.formName, this.checkValidationNeeded.call(this, step.formName))}
                                                     title={step.formTitle} style={{cursor: 'pointer'}}/>)}
                     </Steps>
+                    <Col type="flex" justify="center" align="middle" span={24} style={{marginTop: '15px'}}>Форм завершено {completedFormCount} / 3</Col>
                     <Col type="flex" justify="center" align="middle" span={24} style={{marginTop: '30px'}}>
                         {Form ? <Form goToForm={this.goToForm}/> : 'Загрузка формы...'}
                     </Col>
@@ -102,7 +122,7 @@ const mapStateToProps = (state) => ({
     Form: state.Form,
     activeForm: state.activeForm,
     formController: state.formController,
-    completed: state.completed
+    completedFormsHash: state.completedFormsHash
 });
 
 export default connect(mapStateToProps)(FormContainer);

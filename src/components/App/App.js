@@ -6,10 +6,14 @@ import FormContainer from '../../containers/FormContainer';
 
 const store = createStore({
     activeForm: 'startForm',
-    completed: false,
     formController: null,
     initialValues: {},
-    Form: null
+    Form: null,
+    completedFormsHash: {
+        startForm: false,
+        middleForm: false,
+        endForm: false
+    }
 });
 
 const App = () => (
