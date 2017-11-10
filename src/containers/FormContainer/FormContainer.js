@@ -68,10 +68,13 @@ class FormContainer extends Component {
         //else branch code works only if user goes previous form
         else {
             if(activeFormIndexHash[this.props.activeForm] !== 'endForm'){
-                this.props.dispatch(actions.setFormCompletedStatus({[this.props.activeForm] : false}));
+                const errors = Object.values(formController.getFieldsError()).filter(e => !!e);
+
+                if(formController.isFieldsTouched() && errors.length > 0){
+                    this.props.dispatch(actions.setFormCompletedStatus({[this.props.activeForm] : false}));
+                }
             }
 
-            formController.resetFields();
             dispatchAndSave(formController.getFieldsValue());
         }
 
